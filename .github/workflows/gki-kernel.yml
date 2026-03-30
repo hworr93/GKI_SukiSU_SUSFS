@@ -55,12 +55,6 @@ jobs:
           remove-android: "true"
           remove-haskell: "true"
           remove-codeql: "true"
-          
-      - name: Checkout repository files
-        uses: actions/checkout@v4
-        with:
-          path: GKI_SukiSU_SUSFS
-          
 
       - name: Set CONFIG Environment Variable
         run: |
@@ -190,11 +184,12 @@ jobs:
           # Sync repo and apply patches
           $REPO --version
           $REPO --trace sync -c -j$(nproc --all) --no-tags --fail-fast
-      
-      - name: Inject lxc_defconfig
+    
+      - name: Append lxc_defconfig to gki_defconfig
         run: |
-          echo "Copying lxc_defconfig to kernel source..."
-          cp $GITHUB_WORKSPACE/GKI_SukiSU_SUSFS/lxc_defconfig $CONFIG/common/arch/arm64/configs/lxc_defconfig
+          echo "Appending custom lxc_defconfig to the standard gki_defconfig..."
+          cat $GITHUB_WORKSPACE/GKI_SukiSU_SUSFS/lxc_defconfig >> $CONFIG/common/arch/arm64/configs/gki_defconfig
+          
       
       - name: Determine the branch for KernelSU
         run: |

@@ -165,28 +165,6 @@ jobs:
           echo "CONFIG=$CONFIG" >> $GITHUB_ENV
 
           echo "CONFIG set to: $CONFIG"
-
-      - name: Apply Custom Repository Patches
-        run: |
-          echo "Changing to common directory to apply repository patches..."
-          cd "$CONFIG/common"
-
-          echo "Looking for patches in $GITHUB_WORKSPACE/my-custom-repo/patches/..."
-          
-          # Loop through all .patch files in your repo's patches directory
-          for patch_file in "$GITHUB_WORKSPACE/my-custom-repo/patches/"*.patch; do
-            # Ensure the file actually exists (handles the case where the folder is empty)
-            if [ -f "$patch_file" ]; then
-              echo "================================================="
-              echo "Applying patch: $(basename "$patch_file")"
-              echo "================================================="
-              
-              # Apply the patch using the same fuzz factor you use for your other patches
-              patch -p1 -F 3 < "$patch_file" || echo "Warning: $(basename "$patch_file") applied with fuzz or failed."
-            else
-              echo "No .patch files found in the patches directory."
-            fi
-          done
           
       
       - name: Initialize and Sync Kernel Source
@@ -236,6 +214,28 @@ jobs:
             exit 1
           fi
 
+      - name: Apply Custom Repository Patches
+        run: |
+          echo "Changing to common directory to apply repository patches..."
+          cd "$CONFIG/common"
+
+          echo "Looking for patches in $GITHUB_WORKSPACE/my-custom-repo/patches/..."
+          
+          # Loop through all .patch files in your repo's patches directory
+          for patch_file in "$GITHUB_WORKSPACE/my-custom-repo/patches/"*.patch; do
+            # Ensure the file actually exists (handles the case where the folder is empty)
+            if [ -f "$patch_file" ]; then
+              echo "================================================="
+              echo "Applying patch: $(basename "$patch_file")"
+              echo "================================================="
+              
+              # Apply the patch using the same fuzz factor you use for your other patches
+              patch -p1 -F 3 < "$patch_file" || echo "Warning: $(basename "$patch_file") applied with fuzz or failed."
+            else
+              echo "No .patch files found in the patches directory."
+            fi
+          done
+      
       - name: Add BBG
         shell: bash
         run: |
